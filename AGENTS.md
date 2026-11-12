@@ -58,17 +58,44 @@
 5. **同步文档**：需求一旦变更，先改 `project.md`，再改代码；已被确认的「未确定事项」要从第 5 章移出并落到对应需求里。
 6. **如实汇报**：无法验证的事情（尤其是需要进游戏里观察的行为）如实说明，不要把推测写成结论。
 
-## 6. 工具链（待补充）
+## 6. 工具链（2026-11-12 联网核实）
 
-技术栈尚未确定，因此本节暂时只有占位。确定后**必须**补齐，否则代理无法可靠地构建与验证：
+### 6.1 已核实的事实
 
-- 游戏引擎 / 版本：TBD
-- Mod 框架 / 加载器：TBD
-- 语言与 SDK：TBD
-- 构建命令：TBD
-- 安装 / 卸载 Mod 的方式：TBD
-- 日志与调试手段：TBD
-- 是否需要反编译游戏程序集：TBD
+| 项 | 结论 | 依据 |
+| --- | --- | --- |
+| 游戏 | 《深空当铺：可能是偷的》/ Probably Stolen: Cyberpunk Shopkeeper Sim，Questing Goose Studio 开发，tinyBuild 发行，2026-10-28 发售 | Steam / indienova / GameLook |
+| 引擎 | **Unity** | indienova GameDB 与 Bangumi 均标注 Unity |
+| 脚本后端 | **IL2CPP**（不是 Mono） | 社区 mod 作者自述：Unity IL2CPP build，通过 Il2CppInterop + Harmony 注入 |
+| Mod 框架 | **MelonLoader 0.7.3**（社区 mod 的事实标准），需 .NET 6 Desktop Runtime | 多个社区 mod 的安装说明 |
+| 游戏根目录 | 目录名为 `Probably Stolen` | 社区安装教程的 Steam 路径 |
+| 安装产物 | 根目录出现 `version.dll` / `Mods/` / `Plugins/` / `UserData/` / `dotnet/` | 社区安装教程 |
+| 配置 | `UserData/MelonPreferences.cfg`（TOML） | 社区 mod 说明 |
+| 日志 | `MelonLoader/Latest.log` | 社区排错文档 |
+| 托管程序集 | 首次运行由 `Il2CppAssemblyGenerator`（Cpp2IL + Il2CppInterop）从 `GameAssembly.dll` 生成 | MelonLoader 官方机制 |
+| 游戏内 Mod 支持 | 游戏**自带**一套原生 mod 机制，并有游戏内模组面板 | 社区报道，**尚未自行验证** |
+
+### 6.2 由此产生的硬性技术影响
+
+1. **不能引用 `Assembly-CSharp.dll`**：所有游戏类型/字段必须走 Il2CppInterop 生成的程序集；方法改写用 Harmony 前缀/后缀补丁。
+2. **首次启动很慢**：需要生成 Il2Cpp 程序集，耗时数分钟且需联网。开发机先做一次「空载校验」，确认 `Latest.log` 里有 `[MelonLoader]` 再开始写业务代码。
+3. **版本强绑定**：游戏发售仅两周、正在高频打补丁，加载器与游戏版本高度耦合。**每次验证游戏内行为必须记录游戏版本号**（主菜单显示的版本串），不得假设跨版本兼容。
+4. **复用原版手册 UI 的现实路径**：优先「调用原版打开手册的方法，再把生成出来的界面挪到屏幕左侧 / 改锚点与缩放」，而不是自己重建一套布局。是否可行必须进游戏实测。
+5. **先查原生 mod 机制**：如果游戏自带的扩展点就能拿到手册/物品数据，就不必绕到 Il2Cpp 反射层，实现成本和风险都低一个量级。
+
+### 6.3 待确认（不要当成已知）
+
+- 当前 Steam 版本号，以及 MelonLoader 0.7.3 在该版本是否仍能正常加载（社区存在「新版加载失败」的反馈）
+- 原生 mod 机制的文件格式与扩展点，是否有官方文档
+- 手册界面是 UGUI / UI Toolkit / 即时模式 IMGUI —— 决定能否复用
+- 手册「内容」是物品内嵌文本，还是外部配置/字符串表
+- 构建命令与工程文件（待选定 .NET / SDK 版本后补）
+
+### 6.4 命令占位（测定后替换）
+
+- 构建：TBD
+- 部署到游戏：`cp bin/xxx.dll "<Steam>/steamapps/common/Probably Stolen/Mods/"`
+- 看日志：`tail -f "<Steam>/steamapps/common/Probably Stolen/MelonLoader/Latest.log"`
 
 ## 7. 代码与文档约定
 

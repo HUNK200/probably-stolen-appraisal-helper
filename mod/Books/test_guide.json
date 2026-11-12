@@ -1,0 +1,66 @@
+{
+  "id": "test_guide",
+  "title": "test_guide",
+  "background": "notebook_manual",
+  "width": 628.0,
+  "height": 804.0,
+  "chrome": [
+    {
+      "type": "button",
+      "id": "close",
+      "x": 297.0,
+      "y": 2.5,
+      "w": 14.0,
+      "h": 15.0,
+      "action": "close"
+    },
+    {
+      "type": "button",
+      "id": "zoom",
+      "x": 273.5,
+      "y": 3.5,
+      "w": 14.0,
+      "h": 15.0,
+      "action": "zoom"
+    },
+    {
+      "type": "button",
+      "id": "flip_left",
+      "x": 124.0,
+      "y": 380.0,
+      "w": 16.0,
+      "h": 16.0,
+      "action": "flip_left"
+    },
+    {
+      "type": "button",
+      "id": "flip_right",
+      "x": 176.0,
+      "y": 380.5,
+      "w": 14.0,
+      "h": 15.0,
+      "action": "flip_right"
+    },
+    {
+      "id": "page_indicator",
+      "x": 140.5,
+      "y": 374.0,
+      "w": 33.0,
+      "h": 25.0,
+      "style": "page_number",
+      "align": "center",
+      "valign": "middle",
+      "wrap": false,
+      "action": "page_indicator"
+    }
+  ],
+  "templates": [],
+  "pages": [
+    {
+      "name": "Page 1",
+      "slots": {},
+      "elements": []
+    }
+  ],
+  "locales": []
+}

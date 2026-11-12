@@ -26,10 +26,11 @@ if not exist "%DLL%" goto no_dll
 
 if not exist "%TARGET%" mkdir "%TARGET%"
 copy /y "%DLL%" "%TARGET%\" >nul
-copy /y "%MANIFEST%" "%TARGET%\" >nul
+rem Sync the whole package folder (manifest.xml, Books\, Textures\, Localization\)
+xcopy /e /i /y "%ROOT%\mod\*" "%TARGET%\" >nul
 
 echo [OK] Deployed to: %TARGET%
-echo      Expected files: manifest.xml, AppraisalHelper.dll
+echo      DLL + package contents (manifest.xml, Books\ ...) copied.
 echo      Next: launch game - Mods menu - enable Appraisal Helper - restart game.
 exit /b 0
 

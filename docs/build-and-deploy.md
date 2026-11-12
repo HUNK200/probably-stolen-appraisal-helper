@@ -68,7 +68,7 @@ scripts\deploy.bat
 ```bash
 mkdir "<游戏目录>\Mods\appraisal_helper"
 cp src/AppraisalHelper/bin/Release/netstandard2.1/AppraisalHelper.dll "<游戏目录>\Mods\appraisal_helper\"
-cp mod/manifest.xml "<游戏目录>\Mods\appraisal_helper\"
+cp -r mod/* "<游戏目录>\Mods\appraisal_helper\"
 ```
 
 最终结构必须是：
@@ -76,8 +76,12 @@ cp mod/manifest.xml "<游戏目录>\Mods\appraisal_helper\"
 ```
 <游戏目录>\Mods\appraisal_helper\
 ├── manifest.xml
-└── AppraisalHelper.dll
+├── AppraisalHelper.dll
+└── Books\              ← 纸质手册 JSON（可选）
+    └── test_guide.json
 ```
+
+> 脚本用 `xcopy /e /i /y` 同步整个 `mod/` 目录，所以以后往 `mod/Books/`、`mod/Textures/`、`mod/Localization/` 里加东西，不用改脚本。
 
 三个常见错误：
 

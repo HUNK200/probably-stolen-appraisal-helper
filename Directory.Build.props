@@ -1,0 +1,15 @@
+<Project>
+
+  <!--
+    本文件让所有子项目共用「游戏目录」这一个路径配置。
+
+    · 换机器时只改下面这一行，或者不改，直接设环境变量 PS_GAME_DIR
+    · 游戏路径里带空格，MSBuild 属性会自动处理，不需要额外加引号
+  -->
+  <PropertyGroup>
+    <GameDir Condition="'$(PS_GAME_DIR)' != ''">$(PS_GAME_DIR)</GameDir>
+    <GameDir Condition="'$(GameDir)' == ''">F:\Program Files (x86)\Steam\steamapps\common\Probably Stolen</GameDir>
+    <ManagedDir>$(GameDir)\Probably Stolen_Data\Managed</ManagedDir>
+  </PropertyGroup>
+
+</Project>

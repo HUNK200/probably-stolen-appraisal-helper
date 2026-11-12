@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Mod 清单。缺失则整个模组文件夹会被游戏跳过。
+  ID 会成为磁盘上的文件夹名，只能用 ASCII 字母、数字、下划线、短横线、点。
+-->
+<Manifest>
+  <ID>appraisal_helper</ID>
+  <Name>Appraisal Helper</Name>
+  <Author>HUNK200</Author>
+  <ModVersion>0.1.0</ModVersion>
+  <Description>鉴别时自动把对应的鉴别手册摆到屏幕左侧。</Description>
+
+  <GameVersions>
+    <!-- 前缀匹配：1.0.0 覆盖 1.0.0 的所有修订版。当前实测游戏为 100-REV13 = 1.0.0.13 -->
+    <Version>1.0.0</Version>
+  </GameVersions>
+
+  <!-- 无前置依赖 -->
+  <Prerequisites />
+
+  <!-- 按加载顺序列出，文件名相对模组文件夹 -->
+  <Assemblies>
+    <Assembly>AppraisalHelper.dll</Assembly>
+  </Assemblies>
+
+  <!--
+    能力声明。必须与代码实际行为一致，否则启用会被拒绝。
+    当前代码只做钩子订阅与日志，不读写文件、不联网、不起线程，因此留空。
+    以后若需要读写自己的配置/数据文件，改成：<Capabilities><Capability>files</Capability></Capabilities>
+    注意 native / threads / dynamic-code / reflection-external 自 2026-12-10 起一律拒绝。
+  -->
+  <Capabilities />
+</Manifest>

@@ -154,13 +154,21 @@
 
 - 文档、代码注释、提交信息统一使用**中文**；标识符（类名、变量名）使用英文。
 - 文件编码 UTF-8，行尾 LF（由 `.gitattributes` 统一）。
-- 目录划分建议（随技术栈确定后调整）：
-  - `project.md` — 需求文档，位于根目录
-  - `AGENTS.md` — 代理约定
-  - `src/` — Mod 源码
-  - `docs/` — 技术调研、游戏机制笔记、逆向结论
-  - `assets/` — Mod 需要的贴图 / 本地化文件
-- 不提交：构建产物、游戏本体文件、解包资源、个人配置、日志。
+- 目录划分（已按实际工程落地）：
+
+  | 路径 | 作用 |
+  | --- | --- |
+  | `project.md` | 需求文档，唯一事实来源 |
+  | `AGENTS.md` | 代理约定 |
+  | `README.md` | 对外说明 |
+  | `Directory.Build.props` | 游戏路径配置（`GameDir` / `ManagedDir`） |
+  | `src/AppraisalHelper/` | Mod 源码与 `.csproj` |
+  | `mod/` | 部署包内容：`manifest.xml`，以后放 `Books/`、`Textures/`、`Localization/` |
+  | `scripts/` | `build.bat` / `deploy.bat` |
+  | `docs/` | 调研笔记、验证清单、构建说明 |
+
+- 部署包与源码分离：`mod/` + 编译产物 → `<游戏>/Mods/appraisal_helper/`，不要直接拿 `bin/` 当部署包。
+- 不提交：构建产物（`bin/`、`obj/`）、游戏本体文件、解包资源、个人配置、日志。
 
 ## 8. 需要代理主动维护的文件
 

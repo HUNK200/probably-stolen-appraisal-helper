@@ -1,14 +1,24 @@
 @echo off
-rem 编译模组。产物：src\AppraisalHelper\bin\Release\netstandard2.1\AppraisalHelper.dll
-rem 用法：scripts\build.bat
+rem Build the mod.
+rem Output: src\AppraisalHelper\bin\Release\netstandard2.1\AppraisalHelper.dll
+rem Usage:   scripts\build.bat
+rem
+rem ASCII-only on purpose: cmd.exe reads .bat with the OEM codepage (936 on zh-CN),
+rem so UTF-8 Chinese text in a .bat gets garbled. Keep this file ASCII.
 setlocal
-cd /d "%~dp0.."
+set "ROOT=%~dp0.."
+pushd "%ROOT%" || (echo [ERROR] Cannot enter repo root: %ROOT% & exit /b 1)
+
 dotnet build "src\AppraisalHelper\AppraisalHelper.csproj" -c Release %*
-if errorlevel 1 (
+set "RC=%ERRORLEVEL%"
+popd
+
+if not "%RC%"=="0" (
     echo.
-    echo [失败] 编译未通过，看上面的报错。
-    exit /b 1
+    echo [ERROR] Build failed. See the messages above.
+    exit /b %RC%
 )
+
 echo.
-echo [成功] 产物在 src\AppraisalHelper\bin\Release\netstandard2.1\
+echo [OK] Built: src\AppraisalHelper\bin\Release\netstandard2.1\AppraisalHelper.dll
 exit /b 0

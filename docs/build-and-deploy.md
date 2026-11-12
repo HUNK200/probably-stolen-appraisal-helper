@@ -125,3 +125,37 @@ scripts\build.bat && scripts\deploy.bat
 ```
 
 然后启动游戏 → 模组菜单 → 启用 → 重启 → 看日志。
+
+## 8. 踩过的坑
+
+### 8.1 脚本里的中文变成乱码
+
+现象：
+
+```
+[鎴愬姛] 宸查儴缃插埌锛?TARGET
+'垙' 不是内部或外部命令
+```
+
+原因：`.bat` 文件是 UTF-8，而 `cmd.exe` 按系统 OEM 代码页（简体中文为 936 / GBK）读取批处理文本。多字节中文字符被拆错，甚至拼出非法命令名；`%TARGET%` 这类变量也会被截断成字面量。
+
+处理：**两个 .bat 一律保持纯 ASCII**，中文说明只写在文档里。加 `chcp 65001` 或用 UTF-8 BOM 是另一种思路，但在部分 Windows 版本上会让后续行继续乱码，不采用。
+
+自查命令（应无输出）：
+
+```bash
+grep -nP '[^\x00-\x7F]' scripts/*.bat
+```
+
+### 8.2 PowerShell 里的调用方式
+
+PowerShell 用 `scripts\deploy.bat` 或 `.\scripts\deploy.bat` 都可以；git-bash 里要用 `scripts/deploy.bat`（正斜杠）。
+
+### 8.3 验证记录
+
+| 日期 | 验证内容 | 结果 |
+| --- | --- | --- |
+| 2026-11-12 | `scripts\build.bat` | 编译成功，0 警告 0 错误 |
+| 2026-11-12 | `scripts\deploy.bat`（指向临时模拟目录） | 正确创建 `Mods\appraisal_helper\` 并拷入两个文件 |
+| 2026-11-12 | `scripts\deploy.bat`（错误路径） | 输出 `[ERROR] Probably Stolen.exe not found`，退出码 1 |
+

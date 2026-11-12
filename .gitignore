@@ -1,0 +1,55 @@
+# ============================================================
+# 深空当铺 Mod —— Git 忽略规则
+# 技术栈尚未确定，本文件按「通用 + 分组」方式编写；
+# 确定引擎 / 框架后，删掉不适用的分组即可。
+# ============================================================
+
+# ---------- 系统文件 ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- 编辑器 / IDE ----------
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userprefs
+*.swp
+*~
+
+# ---------- 构建产物 ----------
+build/
+dist/
+out/
+[Bb]in/
+[Oo]bj/
+*.log
+*.tmp
+
+# ---------- 依赖 / 缓存 ----------
+node_modules/
+__pycache__/
+*.pyc
+.paket/
+packages/
+.vsconfig
+
+# ---------- 游戏本体与解包资源（绝不入库） ----------
+/game/
+/gamefiles/
+/DarkSpacePawnshop_Data/
+unpacked/
+extracted/
+*.bundle
+*.assets
+*.pak
+*.assets.resS
+# 如确需提交 Mod 依赖的游戏 DLL，请在此处用 ! 规则单独放行，例如：
+# !/lib/Assembly-CSharp.dll
+
+# ---------- 本地配置 / 机密 ----------
+.env
+.env.local
+*.local.*

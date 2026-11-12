@@ -159,3 +159,15 @@ PowerShell 用 `scripts\deploy.bat` 或 `.\scripts\deploy.bat` 都可以；git-b
 | 2026-11-12 | `scripts\deploy.bat`（指向临时模拟目录） | 正确创建 `Mods\appraisal_helper\` 并拷入两个文件 |
 | 2026-11-12 | `scripts\deploy.bat`（错误路径） | 输出 `[ERROR] Probably Stolen.exe not found`，退出码 1 |
 
+
+### 8.4 首次进游戏验证（2026-11-12）
+
+部署后启动游戏、在模组菜单启用、重启，日志出现：
+
+```
+[22:41:01] [Log] [Appraisal Helper]: 检测到存档载入完成，游戏对象可用
+```
+
+说明加载链路全部打通：DLL 被加载、能力扫描通过、`ModLog` 输出正常（中文无乱码）、`ModHook.OnGameLoadedNormal` 正常触发。
+
+> 同一份日志里还看到已启用的第三方模组 `Smart Inventory Arrange`，后续做兼容性验证时要一并覆盖。

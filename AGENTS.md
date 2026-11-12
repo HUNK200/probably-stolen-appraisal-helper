@@ -127,11 +127,27 @@
 - 鉴别流程的入口方法
 - 游戏版本串（主菜单显示的那个，如 `100-REV3`）
 
-### 6.5 构建与验证命令（测定后替换）
+### 6.5 构建与验证命令
 
-- 构建：`dotnet build`（目标框架待定）
-- 部署：`cp bin/xxx.dll "<游戏根目录>/Mods/"`
-- 日志：原生框架的日志位置待确认
+- 目标框架：`netstandard2.1`（官方模板如此，Unity 2021.3 Mono 可直接加载）
+- 构建：`dotnet build -c Release` → `bin/Release/netstandard2.1/<Name>.dll`
+- 部署：DLL 与 `manifest.xml` 一起放进 `<游戏根目录>/Mods/<ModId>/`
+- 调试：游戏 exe 旁放空文件 `dev.txt` → 游戏内 `F8` 控制台、`F9` 开发菜单
+- 手册调试命令：`paper-list` / `paper-open <id>` / `paper-close` / `paper-reload`
+- 能力自查：`mod-scan <ModId>`
+
+### 6.6 参考资源
+
+- **`docs/mod-api-notes.md`** —— 本项目的 API 速查笔记（包结构、manifest、生命周期、钩子、纸质手册、鉴定 API）。写代码前先读它。
+- 社区指南（开发者账号在 Steam 讨论区贴出的链接）：https://github.com/dragonpan2/probably-stolen-modding
+- 开发模板 + 文档工具：https://github.com/aamobe/probably-stolen-mod-dev
+
+**两条硬性技术红线（来自框架的能力扫描器）：**
+
+1. `Capabilities` 必须与实际行为一致，扫描器发现未声明能力会**直接拒绝启用**。我们默认 `<Capabilities />`；需要读写自己的文件时声明 `files`。
+2. `native`、`threads`、`dynamic-code`、`reflection-external` **将于 2026-12-10 起一律拒绝**，不要在任何设计里依赖它们。
+
+**优先级规则：钩子（`ModHook`）> Harmony 补丁。** 只有在没有对应钩子时才用 Harmony。
 
 
 ## 7. 代码与文档约定

@@ -76,44 +76,63 @@
 5. **同步文档**：需求一旦变更，先改 `project.md`，再改代码；已被确认的「未确定事项」要从第 5 章移出并落到对应需求里。
 6. **如实汇报**：无法验证的事情（尤其是需要进游戏里观察的行为）如实说明，不要把推测写成结论。
 
-## 6. 工具链（2026-11-12 联网核实）
+## 6. 工具链
 
-### 6.1 已核实的事实
+### 6.1 已核实的事实（2026-11-12 实机检查游戏目录）
+
+游戏根目录：`F:\Program Files (x86)\Steam\steamapps\common\Probably Stolen`
 
 | 项 | 结论 | 依据 |
 | --- | --- | --- |
-| 游戏 | 《深空当铺：可能是偷的》/ Probably Stolen: Cyberpunk Shopkeeper Sim，Questing Goose Studio 开发，tinyBuild 发行，2026-10-28 发售 | Steam / indienova / GameLook |
-| 引擎 | **Unity** | indienova GameDB 与 Bangumi 均标注 Unity |
-| 脚本后端 | **IL2CPP**（不是 Mono） | 社区 mod 作者自述：Unity IL2CPP build，通过 Il2CppInterop + Harmony 注入 |
-| Mod 框架 | **MelonLoader 0.7.3**（社区 mod 的事实标准），需 .NET 6 Desktop Runtime | 多个社区 mod 的安装说明 |
-| 游戏根目录 | 目录名为 `Probably Stolen` | 社区安装教程的 Steam 路径 |
-| 安装产物 | 根目录出现 `version.dll` / `Mods/` / `Plugins/` / `UserData/` / `dotnet/` | 社区安装教程 |
-| 配置 | `UserData/MelonPreferences.cfg`（TOML） | 社区 mod 说明 |
-| 日志 | `MelonLoader/Latest.log` | 社区排错文档 |
-| 托管程序集 | 首次运行由 `Il2CppAssemblyGenerator`（Cpp2IL + Il2CppInterop）从 `GameAssembly.dll` 生成 | MelonLoader 官方机制 |
-| 游戏内 Mod 支持 | 游戏**自带**一套原生 mod 机制，并有游戏内模组面板 | 社区报道，**尚未自行验证** |
+| 游戏 | 《深空当铺：可能是偷的》/ Probably Stolen: Cyberpunk Shopkeeper Sim，Questing Goose Studio 开发，tinyBuild 发行 | Steam / indienova / GameLook |
+| 引擎 | **Unity 2021.3.45f2** | exe 的 ProductVersion；根目录有 `UnityPlayer.dll` |
+| 脚本后端 | **Mono**（不是 IL2CPP） | 存在 `MonoBleedingEdge/` 与 `_Data/Managed/Assembly-CSharp.dll`（4.8 MB），**没有** `GameAssembly.dll` |
+| **原生 Mod 框架** | **游戏自带**，程序集内含 `ModLoader` / `ModScanner` / `ModReflect` / `ModManifest` / `IMod` 等类型 | 从 `Assembly-CSharp.dll` 字符串表提取，见 6.2 |
+| Mod 目录 | 游戏根目录 `Mods/`（安装时自带，当前为空） | `ls` 实机确认 |
+| 游戏内 Mod 面板 | 存在（`ModUIManager`、`ModEnablePromptUI`、`ModConfigWindow`） | 同上 |
+| 游戏自带库 | `0Harmony.dll`、`DseCecil.dll`（Mono.Cecil）、DOTween、Newtonsoft.Json、QFSW.QC（控制台） | `Managed/` 目录列表 |
 
-### 6.2 由此产生的硬性技术影响
+> **更正记录：** 先前依据社区 mod 仓库自述判定为「IL2CPP」。实机检查证明**本机这个正式版是 Mono**。该社区信息可能对应 Demo / Playtest 版本，或直接是错的。以实机为准。
 
-1. **不能引用 `Assembly-CSharp.dll`**：所有游戏类型/字段必须走 Il2CppInterop 生成的程序集；方法改写用 Harmony 前缀/后缀补丁。
-2. **首次启动很慢**：需要生成 Il2Cpp 程序集，耗时数分钟且需联网。开发机先做一次「空载校验」，确认 `Latest.log` 里有 `[MelonLoader]` 再开始写业务代码。
-3. **版本强绑定**：游戏发售仅两周、正在高频打补丁，加载器与游戏版本高度耦合。**每次验证游戏内行为必须记录游戏版本号**（主菜单显示的版本串），不得假设跨版本兼容。
-4. **复用原版手册 UI 的现实路径**：优先「调用原版打开手册的方法，再把生成出来的界面挪到屏幕左侧 / 改锚点与缩放」，而不是自己重建一套布局。是否可行必须进游戏实测。
-5. **先查原生 mod 机制**：如果游戏自带的扩展点就能拿到手册/物品数据，就不必绕到 Il2Cpp 反射层，实现成本和风险都低一个量级。
+### 6.2 游戏原生 Mod 框架（已从字符串表确认的类型）
 
-### 6.3 待确认（不要当成已知）
+| 类型 / 成员 | 推测职责 |
+| --- | --- |
+| `IMod`、`IModNameBytes`、`ModHelper`、`ModHook`、`ModLog` | Mod 入口接口与辅助 API |
+| `ModLoader`、`ModScanner.EnumerateModFiles`、`ModReflect.ScopeAssemblies` | 扫描与加载 |
+| `ModManifest`、`ParseManifestCore`、`manifest` | 清单解析（格式待确认，疑似 JSON） |
+| `RunningPrerequisites`、`IsRunningPrerequisite`、`OrderByPrerequisites` | Mod 前置依赖排序 |
+| `ModConfig`、`ModConfigWindow`、`ModHasSettings`、`ModEnableCheck`、`ModEnablePromptUI` | 配置面板与首次启用授权 |
+| `ModDataStore`、`ModDataKey`、`ClearModData`、`ModDataFileExists` | 给 Mod 用的持久化存储 |
+| `ModItemDirectory` | Mod 物品目录（疑似可注册物品） |
+| `ModLootEntryJson`、`ModLootPatchJson`、`ModLootFileJson` | 以 JSON 打补丁修改掉落表 |
+| `EnabledMods`、`LocalMods`、`ModAssemblies`、`ModFingerprint`、`ModIdOfAssembly` | 启用列表、程序集与指纹 |
 
-- 当前 Steam 版本号，以及 MelonLoader 0.7.3 在该版本是否仍能正常加载（社区存在「新版加载失败」的反馈）
-- 原生 mod 机制的文件格式与扩展点，是否有官方文档
-- 手册界面是 UGUI / UI Toolkit / 即时模式 IMGUI —— 决定能否复用
-- 手册「内容」是物品内嵌文本，还是外部配置/字符串表
-- 构建命令与工程文件（待选定 .NET / SDK 版本后补）
+**结论：优先做「原生 Mod」，不要用 MelonLoader。** 理由：不受加载器与游戏版本绑定影响；能直接复用游戏自己的配置面板与数据存储；符合项目「复用原版」的原则。
 
-### 6.4 命令占位（测定后替换）
+### 6.3 由此产生的硬性技术影响
 
-- 构建：TBD
-- 部署到游戏：`cp bin/xxx.dll "<Steam>/steamapps/common/Probably Stolen/Mods/"`
-- 看日志：`tail -f "<Steam>/steamapps/common/Probably Stolen/MelonLoader/Latest.log"`
+1. **Mono 后端**：可以直接在工程里引用 `Probably Stolen_Data/Managed/Assembly-CSharp.dll`，用 Harmony（游戏自带 `0Harmony.dll`）打补丁。不需要 Cpp2IL / Il2CppInterop。
+2. **目标框架用 `net472` 或 `netstandard2.1`**：Unity 2021.3 Mono 的运行时基于 .NET Framework 4.x API 面，不要用 `net6.0`/`net8.0` 以免加载失败。（待实测确认）
+3. **版本绑定依旧存在**：游戏高频打补丁，`Assembly-CSharp.dll` 的签名会变。每次验证必须记录游戏版本号；用反射访问而非硬编码偏移。
+4. **复用原版手册 UI 的现实路径**：优先「调用原版打开手册的方法，再把生成出来的界面挪到屏幕左侧 / 改锚点与缩放」，而不是自己重建布局。
+5. **先读原生 API 再写代码**：`IMod` 的成员签名、manifest 格式必须反编译确认，不得凭类型名猜。
+
+### 6.4 待确认（不要当成已知）
+
+- `IMod` 接口成员与方法签名、manifest 的确切字段与文件名
+- Mod 是「一个 DLL + 一个 manifest」还是「一个文件夹」
+- 手册的运行时类型名、手册内容的数据结构
+- 手册界面技术栈（UGUI / UI Toolkit / IMGUI）
+- 鉴别流程的入口方法
+- 游戏版本串（主菜单显示的那个，如 `100-REV3`）
+
+### 6.5 构建与验证命令（测定后替换）
+
+- 构建：`dotnet build`（目标框架待定）
+- 部署：`cp bin/xxx.dll "<游戏根目录>/Mods/"`
+- 日志：原生框架的日志位置待确认
+
 
 ## 7. 代码与文档约定
 

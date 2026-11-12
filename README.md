@@ -35,15 +35,15 @@
 
 | 项 | 结论 | 说明 |
 | --- | --- | --- |
-| 引擎 | Unity | 游戏库标注，已核实 |
-| 脚本后端 | **IL2CPP**（非 Mono） | 决定代码写法：不能直接引用 `Assembly-CSharp.dll` |
-| Mod 框架 | MelonLoader 0.7.3 + .NET 6 Desktop Runtime | 社区 mod 的事实标准 |
-| 配置文件 | `UserData/MelonPreferences.cfg`（TOML） | |
-| 日志 | `MelonLoader/Latest.log` | 排错第一入口 |
+| 引擎 | Unity 2021.3.45f2 | 实机确认 |
+| 脚本后端 | **Mono**（非 IL2CPP） | 有 `MonoBleedingEdge/` + `_Data/Managed/Assembly-CSharp.dll`，无 `GameAssembly.dll` |
+| Mod 形式 | **游戏原生 Mod**（`IMod` + manifest） | 不走 MelonLoader；根目录 `Mods/` 为游戏自带 |
+| 依赖 | 游戏自带 `0Harmony.dll`、`DseCecil.dll`、Newtonsoft.Json | 可直接引用游戏程序集 |
+| 日志 | 待确认 | |
 
-> **优先调研项：** 游戏自带一套原生 mod 机制（主菜单有模组面板）。若原生扩展点就能拿到手册与物品数据，实现难度会低一个量级，应在反编译之前先确认。
+> **一次关键更正：** 最初依据社区资料判定为 IL2CPP + MelonLoader，实机检查证明是 **Mono + 原生 Mod 框架**。这个差别很大——省掉了 Cpp2IL / Il2CppInterop 整条链路，也避免了加载器与游戏版本绑定带来的崩溃风险。
 >
-> **版本风险：** 游戏 2026-10-28 发售，仍在高频更新；加载器与游戏版本强绑定，每次验证都需记录游戏版本号。
+> **版本风险：** 游戏 2026-10-28 发售，仍在高频更新，`Assembly-CSharp.dll` 会随补丁变动；每次验证都需要记录游戏版本号。
 
 ## 目录结构
 
